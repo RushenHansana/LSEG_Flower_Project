@@ -1,0 +1,12 @@
+Order Id , Cl. Ord. ID , Instrument , Side , Exec Status , Quantity , Price , Reason , Transaction Time 
+ord1,aa15,Rose,2,New,60,55.5,,20230822-224523.111
+ord2,aa12,Rose,2,New,50,50,,20230822-224523.112
+ord3,aa13,Rose,1,Pfill,50,60,,20230822-224523.112
+ord2,aa12,Rose,2,Fill,50,50,,20230822-224523.112
+ord3,aa13,Rose,1,Fill,50,60,,20230822-224523.112
+ord1,aa15,Rose,2,Pfill,10,55.5,,20230822-224523.112
+ord4,aa14,Rose,1,Pfill,90,65,,20230822-224523.112
+ord1,aa15,Rose,2,Fill,10,55.5,,20230822-224523.112
+ord5,,,,Rejected,,,does not contain a required field,20230822-224523.112
+ord6,aa16,Rose,1,Rejected,15,50.00,quantity is not a multiple of 10,20230822-224523.112
+ord7,aa17,rose,1,Rejected,15,0.00,invalid Instrument,20230822-224523.112
