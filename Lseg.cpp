@@ -109,7 +109,7 @@ void processOrdersBuy(vector<Buy_Sell> &Buy, vector<Buy_Sell> &Sell, Buy_Sell &o
             Sell[0].Exec_status = 2;
             order1.Exec_status = 2;
             file << order1.OrderID << "," << order1.CLID << "," << order1.Instr << "," << order1.Side << ","
-                 << exec_st(order1) << "," << order1.Quantity << "," << order1.Price<<",," << get_current_time() << "\n"
+                 << exec_st(order1) << "," << order1.Quantity << "," << Sell[0].Price<<",," << get_current_time() << "\n"
                  << Sell[0].OrderID << "," << Sell[0].CLID << "," << Sell[0].Instr << "," << Sell[0].Side << ","
                  << exec_st(Sell[0]) << "," << Sell[0].Quantity << "," << Sell[0].Price <<",," << get_current_time()<< "\n";
             Sell.erase(Sell.begin());
@@ -118,17 +118,17 @@ void processOrdersBuy(vector<Buy_Sell> &Buy, vector<Buy_Sell> &Sell, Buy_Sell &o
             Sell[0].Exec_status = 3;
             order1.Exec_status = 2;
             file << order1.OrderID << "," << order1.CLID << "," << order1.Instr << "," << order1.Side << ","
-                 << exec_st(order1) << "," << order1.Quantity << "," << order1.Price <<",," << get_current_time()<< "\n";
+                 << exec_st(order1) << "," << order1.Quantity << "," << Sell[0].Price <<",," << get_current_time()<< "\n";
             Sell[0].Quantity = Sell[0].Quantity - order1.Quantity;
             file << Sell[0].OrderID << "," << Sell[0].CLID << "," << Sell[0].Instr << "," << Sell[0].Side << ","
-                 << exec_st(Sell[0]) << "," << Sell[0].Quantity << "," << Sell[0].Price <<",," << get_current_time()<< "\n";
+                 << exec_st(Sell[0]) << "," << order1.Quantity << "," << Sell[0].Price <<",," << get_current_time()<< "\n";
             break;
         } else if (Sell[0].Quantity < order1.Quantity) {
             Sell[0].Exec_status = 2;
             order1.Exec_status = 3;
             order1.Quantity = order1.Quantity - Sell[0].Quantity;
             file << order1.OrderID << "," << order1.CLID << "," << order1.Instr << "," << order1.Side << ","
-                 << exec_st(order1) << "," << order1.Quantity << "," << order1.Price<<",," << get_current_time() << "\n";
+                 << exec_st(order1) << "," << Sell[0].Quantity << "," << Sell[0].Price<<",," << get_current_time() << "\n";
             file << Sell[0].OrderID << "," << Sell[0].CLID << "," << Sell[0].Instr << "," << Sell[0].Side << ","
                  << exec_st(Sell[0]) << "," << Sell[0].Quantity << "," << Sell[0].Price <<",," << get_current_time()<< "\n";
             Sell.erase(Sell.begin());
@@ -161,7 +161,7 @@ void processOrdersSell(std::vector<Buy_Sell> &Buy, std::vector<Buy_Sell> &Sell, 
             Buy[0].Exec_status = 2;
             order1.Exec_status = 2;
             file << order1.OrderID << "," << order1.CLID << "," << order1.Instr << "," << order1.Side << ","
-                 << exec_st(order1) << "," << order1.Quantity << "," << order1.Price<<",," << get_current_time() << "\n"
+                 << exec_st(order1) << "," << order1.Quantity << "," << Buy[0].Price <<",," << get_current_time() << "\n"
                  << Buy[0].OrderID << "," << Buy[0].CLID << "," << Buy[0].Instr << "," << Buy[0].Side << ","
                  << exec_st(Buy[0]) << "," << Buy[0].Quantity << "," << Buy[0].Price <<",," << get_current_time()<< "\n";
             Buy.erase(Buy.begin());
@@ -170,17 +170,17 @@ void processOrdersSell(std::vector<Buy_Sell> &Buy, std::vector<Buy_Sell> &Sell, 
             Buy[0].Exec_status = 3;
             order1.Exec_status = 2;
             file << order1.OrderID << "," << order1.CLID << "," << order1.Instr << "," << order1.Side << ","
-                 << exec_st(order1) << "," << order1.Quantity << "," << order1.Price <<",," << get_current_time()<< "\n";
+                 << exec_st(order1) << "," << order1.Quantity << "," << Buy[0].Price <<",," << get_current_time()<< "\n";
             Buy[0].Quantity = Buy[0].Quantity - order1.Quantity;
             file << Buy[0].OrderID << "," << Buy[0].CLID << "," << Buy[0].Instr << "," << Buy[0].Side << ","
-                 << exec_st(Buy[0]) << "," << Buy[0].Quantity << "," << Buy[0].Price<<",," << get_current_time() << "\n";
+                 << exec_st(Buy[0]) << "," << order1.Quantity << "," << Buy[0].Price<<",," << get_current_time() << "\n";
             break;
         } else if (Buy[0].Quantity < order1.Quantity) {
             Buy[0].Exec_status = 2;
             order1.Exec_status = 3;
             order1.Quantity = order1.Quantity - Buy[0].Quantity;
             file << order1.OrderID << "," << order1.CLID << "," << order1.Instr << "," << order1.Side << ","
-                 << exec_st(order1) << "," << order1.Quantity << "," << order1.Price<<",," << get_current_time() << "\n";
+                 << exec_st(order1) << "," << Buy[0].Quantity << "," << Buy[0].Price<<",," << get_current_time() << "\n";
             file << Buy[0].OrderID << "," << Buy[0].CLID << "," << Buy[0].Instr << "," << Buy[0].Side << ","
                  << exec_st(Buy[0]) << "," << Buy[0].Quantity << "," << Buy[0].Price<<",," << get_current_time() << "\n";
             Buy.erase(Buy.begin());
@@ -204,11 +204,13 @@ void processOrdersSell(std::vector<Buy_Sell> &Buy, std::vector<Buy_Sell> &Sell, 
 
 
 int main() {
+
     // Create an input file stream object
     ifstream fin;
 
     // Specify the path of the CSV file
-    string filePath = "C://Users//disan//Documents//LSEG//orders (copy).csv";
+    string filePath = "H://Data//Document//LSEG//order (3).csv";
+
     // Open the CSV file
     fin.open(filePath);
 
@@ -218,7 +220,7 @@ int main() {
         return 1;
     }
     // Create a new file named "execution_rep.csv" for writing
-    ofstream file("C://Users//disan//Documents//LSEG//execution_rep.csv");
+    ofstream file("H://Data//Document//LSEG//execution_rep.csv");
     if (!file.is_open()) {
         cerr << "Error creating file." << endl;
         return 1;
@@ -239,7 +241,7 @@ int main() {
         if (i==0){//do not read first line of order.csv//
             continue;
         }
-
+        //////////check validity of order///////////////////
         if (!(validateAndWriteToFile(file, OrderID, CLID, Instr, Side, Quantity, Price))) {
             continue;
         }
