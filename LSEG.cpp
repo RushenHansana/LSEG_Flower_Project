@@ -268,7 +268,7 @@ int main() {
     ifstream fin;
 
     // Specify the path of the CSV file
-    string filePath = "order (4).csv";
+    string filePath = "order.csv";
 
     // Open the CSV file
     fin.open(filePath);
@@ -279,7 +279,7 @@ int main() {
         return 1;
     }
     // Create a new file named "execution_rep.csv" for writing
-    ofstream file("execution_rep_opt.csv");
+    ofstream file("execution_rep.csv");
     
     thread validationThread(validateAndWriteToFile, std::ref(file), OrderID, CLID, Instr, Side, Quantity, Price);
     if (!file.is_open()) {
