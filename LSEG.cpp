@@ -11,7 +11,7 @@
 #include <atomic> 
 using namespace std;
 
-string line,CLID,Instr,Side,Quantity,Price;
+string line,CLID,Instr,Side,Quantity,Price,OrderID;
 
 
 // Define a class named 'Buy_Sell'
@@ -74,39 +74,79 @@ string exec_st(Buy_Sell order) {
 
 ///////////////////////////////check the validity of the order///////////////////////////////////////
 
-bool validateAndWriteToFile(ofstream& file, const string& OrderID, const string& CLID,const string& Instr,
+/*bool validateAndWriteToFile(ofstream& file, const string& OrderID, const string& CLID,const string& Instr,
                              const string& Side, const string& Quantity,const string& Price) {
     string current_time;
     lock_guard<std::mutex> lock(timeMutex);
     current_time = currentTime;
     if (CLID.length() < 1 || Instr.length() < 1 || Side.length() < 1 || Quantity.length() < 1 || Price.length() < 1) {
-        file << OrderID << "," << CLID << "," << Instr << "," << Side << "," << "Rejected" << "," << Quantity << ","
+        file << OrderID << "," << CLID << "," << Instr << "," << Side << "," << 1 << "," << Quantity << ","
              << Price << "," <<"does not contain a required field" <<"," << current_time<<"\n";
         return false;
     } else if (!(Instr == "Rose" || Instr == "Lavender" || Instr == "Lotus" || Instr == "Tulip" || Instr == "Orchid")) {
-        file << OrderID << "," << CLID << "," << Instr << "," << Side << "," << "Rejected" << "," << Quantity << ","
+        file << OrderID << "," << CLID << "," << Instr << "," << Side << "," << 1 << "," << Quantity << ","
              << Price << "," << "invalid Instrument"<<"," <<current_time << "\n";
         return false;
     } else if (!(Side == "1" || Side == "2")) {
-        file << OrderID << "," << CLID << "," << Instr << "," << Side << "," << "Rejected" << "," << Quantity << ","
+        file << OrderID << "," << CLID << "," << Instr << "," << Side << "," << 1 << "," << Quantity << ","
              << Price << "," << "invalid side"<<"," << current_time << "\n";
         return false;
     } else if (std::stod(Price) <= 0) {
-        file << OrderID << "," << CLID << "," << Instr << "," << Side << "," << "Rejected" << "," << Quantity << ","
+        file << OrderID << "," << CLID << "," << Instr << "," << Side << "," << 1 << "," << Quantity << ","
              << Price << "," << "price is not greater than 0"<<"," << current_time << "\n";
         return false;
     } else if (!(std::stoi(Quantity) % 10 == 0)) {
-        file << OrderID << "," << CLID << "," << Instr << "," << Side << "," << "Rejected" << "," << Quantity << ","
+        file << OrderID << "," << CLID << "," << Instr << "," << Side << "," << 1 << "," << Quantity << ","
              << Price << "," << "quantity is not a multiple of 10" <<"," << current_time<< "\n";
         return false;
     } else if (!(std::stoi(Quantity) <= 1000 && 10 <= std::stoi(Quantity))) {
-        file << OrderID << "," << CLID << "," << Instr << "," << Side << "," << "Rejected" << "," << Quantity << ","
+        file << OrderID << "," << CLID << "," << Instr << "," << Side << "," << 1 << "," << Quantity << ","
              << Price << "," << "quantity is outside the range"<<"," << current_time << "\n";
         return false;
     }
 
     // If all checks passed
     return true;
+}*/
+bool validateAndWriteToFile(std::ofstream& file, const std::string& OrderID, const std::string& CLID,
+                            const std::string& Instr, const std::string& Side, const std::string& Quantity,
+                            const std::string& Price) {
+    // Your validation and writing logic here...
+
+    bool valid = true;
+    std::string error_message;
+
+    if (CLID.length() < 1 || Instr.length() < 1 || Side.length() < 1 || Quantity.length() < 1 || Price.length() < 1) {
+        valid = false;
+        error_message = "does not contain a required field";
+    } else if (!(Instr == "Rose" || Instr == "Lavender" || Instr == "Lotus" || Instr == "Tulip" || Instr == "Orchid")) {
+        valid = false;
+        error_message = "invalid Instrument";
+    } else if (!(Side == "1" || Side == "2")) {
+        valid = false;
+        error_message = "invalid side";
+    } else if (std::stod(Price) <= 0) {
+        valid = false;
+        error_message = "price is not greater than 0";
+    } else if (!(std::stoi(Quantity) % 10 == 0)) {
+        valid = false;
+        error_message = "quantity is not a multiple of 10";
+    } else if (!(std::stoi(Quantity) <= 1000 && 10 <= std::stoi(Quantity))) {
+        valid = false;
+        error_message = "quantity is outside the range";
+    }
+
+    std::lock_guard<std::mutex> lock(timeMutex);
+    std::string current_time = currentTime;
+
+    if (!valid) {
+        file << OrderID << "," << CLID << "," << Instr << "," << Side << "," << 1 << "," << Quantity << ","
+             << Price << "," << error_message << "," << current_time << "\n";
+        return valid;
+    } else {
+        // If all checks passed, write the valid data to the file or perform other actions
+        return valid;
+    }
 }
 
 //////////////////////////process the Buy orders/////////////////////////////////////////////////////
@@ -223,11 +263,12 @@ void processOrdersSell(std::vector<Buy_Sell> &Buy, std::vector<Buy_Sell> &Sell, 
 int main() {
     thread time_thread(get_current_time);
     this_thread::sleep_for(std::chrono::seconds(1));
+    
     // Create an input file stream object
     ifstream fin;
 
     // Specify the path of the CSV file
-    string filePath = "order (2).csv";
+    string filePath = "order (4).csv";
 
     // Open the CSV file
     fin.open(filePath);
@@ -238,7 +279,9 @@ int main() {
         return 1;
     }
     // Create a new file named "execution_rep.csv" for writing
-    ofstream file("execution_rep.csv");
+    ofstream file("execution_rep_opt.csv");
+    
+    thread validationThread(validateAndWriteToFile, std::ref(file), OrderID, CLID, Instr, Side, Quantity, Price);
     if (!file.is_open()) {
         cerr << "Error creating file." << endl;
         return 1;
@@ -312,6 +355,7 @@ int main() {
         
     }
     }
+    validationThread.join();
     shouldStop = true;
     time_thread.join();
     // Close the file
